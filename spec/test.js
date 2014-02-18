@@ -1,5 +1,5 @@
 describe("Notes", function() {
-	var note = new Note('A4', 1/4);
+	var note = new boe.Note('A4', 1/4);
 
 	it("can be displayed", function() {
 		expect(note.display()).toBe("A4"); 

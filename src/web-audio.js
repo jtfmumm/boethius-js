@@ -5,15 +5,15 @@ var webAudio = (function() {
     var channels = {};
 
     function Osc(parameters) {
-    	this.osc = ctx.createOscillator;
+    	this.osc = ctx.createOscillator();
         this.node = this.osc;
     	this.osc.type = parameters.type; //e.g. 'square'
     }
-    Osc.play = function(freq, ticks) {
+    Osc.prototype.play = function(freq, ticks) {
     	this.osc.frequency.value = freq;
         this.osc.start(ticks);
     };
-    Osc.connect = function(target) {
+    Osc.prototype.connect = function(target) {
         this.osc.connect(target);
     };
 
@@ -36,8 +36,9 @@ var webAudio = (function() {
     function Instrument(parameters) {
         this.osc = new Osc(parameters.osc);
         this.envelope = new Envelope(parameters.envelope);
-        osc.node.connect(envelope.node);
-        envelope.node.connect(ctx.destination);
+
+        this.osc.node.connect(this.envelope.node);
+        this.envelope.node.connect(ctx.destination);
     }
     Instrument.prototype.play = function(note, ticks) {
         this.osc.play(note.getFreq(), ticks);
@@ -48,12 +49,70 @@ var webAudio = (function() {
         channels[channelNumber] = instrument;
     }
 
+
+    //Set up initial instruments
+    var inst0 = {
+        osc: {
+            type: 'square'
+        },
+        envelope: {
+            attack: 20,
+            decay: 0,
+            sustain: 20,
+            release: 20
+        }
+    };
+
+    var inst1 = {
+        osc: {
+            type: 'sawtooth'
+        },
+        envelope: {
+            attack: 20,
+            decay: 0,
+            sustain: 20,
+            release: 20
+        }
+    };
+
+    var inst2 = {
+        osc: {
+            type: 'triangle'
+        },
+        envelope: {
+            attack: 20,
+            decay: 0,
+            sustain: 0,
+            release: 20
+        }
+    };
+
+    var inst3 = {
+        osc: {
+            type: 'square'
+        },
+        envelope: {
+            attack: 0,
+            decay: 0,
+            sustain: 20,
+            release: 20
+        }
+    };
+
+    channels[0] = new Instrument(inst0);
+    channels[1] = new Instrument(inst1);
+    channels[2] = new Instrument(inst2);
+    channels[3] = new Instrument(inst3);
+
+
+
     var wa = {
         channels: channels,
         assignChannel: assignChannel,
         Instrument: Instrument,
         Envelope: Envelope,
-        Osc: Osc
+        Osc: Osc,
+        ctx: ctx
     };
 
     return wa;
